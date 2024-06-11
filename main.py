@@ -2,6 +2,7 @@ import numpy as np
 from models.character_model import CharacterModel
 from keras.datasets import mnist
 from models.mnist_model import MnistModel
+from models.simple_mnist_model import SimpleMnistModel
 
 
 def one_hot_encode(data):
@@ -21,9 +22,9 @@ input_test = input_test / 255
 label_data = one_hot_encode(label_data)
 label_test = one_hot_encode(label_test)
 
-model1 = MnistModel(input_shape=(28, 28, 1), output_shape=10)
+model1 = SimpleMnistModel(input_shape=(28, 28, 1), output_shape=10)
 model1.compile()
 model1.fit(input_data, label_data, epochs=5, val_proportion=0.3)
-print(f'max_value: {model1.evaluate(input_test, label_test)}')
-print(f'threshold {model1.evaluate(input_test, label_test, threshold=0.8)}')
+accuracy = model1.evaluate(input_test, label_test)
 model1.plot_loss()
+model1.save_model({'accuracy': accuracy})

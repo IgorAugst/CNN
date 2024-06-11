@@ -1,9 +1,41 @@
+import os
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
 
 class BaseModel:
+	def save_model(self, custom_data: dict):
+		os.makedirs('./modelos', exist_ok=True)
+
+		if not os.path.exists(f'./modelos/models.json'):
+			with open(f'./modelos/models.json', 'w') as f:
+				json.dump([], f)
+
+		with open(f'./modelos/models.json', 'r') as f:
+			models = json.load(f)
+
+		model_name = self.__class__.__name__ + '_' + str(len(models))
+
+		os.makedirs(f'./modelos/{model_name}', exist_ok=True)
+
+		self.model.save(f'./modelos/{model_name}/modelo.keras')
+		self.plot_loss(save=True, path=f'./modelos/{model_name}/loss.png')
+
+		model_info = {
+			'model_name': model_name,
+			'history': self.training_history.history,
+			'custom_data': custom_data,
+		}
+
+		models.append(model_info)
+
+		with open(f'./modelos/models.json', 'w') as f:
+			json.dump(models, f)
+
+	def load_model(self, model_name):
+		self.model = tf.keras.models.load_model(f'./modelos/{model_name}/modelo.keras')
 
 	def compile(self, optimizer='adam', loss='mean_squared_error'):
 		self.model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
@@ -38,7 +70,7 @@ class BaseModel:
 
 		return accuracy / len(predictions)
 
-	def plot_loss(self):
+	def plot_loss(self, save=False, path=None):
 		training_loss = self.training_history.history['loss']
 		validation_loss = self.training_history.history['val_loss']
 
@@ -47,4 +79,9 @@ class BaseModel:
 		plt.xlabel('Época')
 		plt.ylabel('Erro')
 		plt.legend()
-		plt.show()
+
+		if save:
+			plt.savefig(path)
+			plt.close()
+		else:
+			plt.show()
