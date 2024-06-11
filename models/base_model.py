@@ -60,15 +60,19 @@ class BaseModel:
 		predictions = self.model.predict(test_data, verbose=False)
 		accuracy = 0
 
+		confusion_matrix = np.zeros((self.output_shape, self.output_shape))
+
 		for i, pred in enumerate(predictions):
 			if threshold is None:
 				accuracy += (np.argmax(pred) == np.argmax(test_target[i]))
+				confusion_matrix[np.argmax(test_target[i])][np.argmax(pred)] += 1
 			else:
 				arr = np.where(pred > threshold, 1, 0)
 				if sum(arr) == 1:
 					accuracy += np.argmax(arr) == np.argmax(test_target[i])
+					confusion_matrix[np.argmax(test_target[i])][np.argmax(arr)] += 1
 
-		return accuracy / len(predictions)
+		return {'accuracy': accuracy / len(test_data), 'confusion_matrix': confusion_matrix}
 
 	def plot_loss(self, save=False, path=None):
 		training_loss = self.training_history.history['loss']
@@ -85,3 +89,16 @@ class BaseModel:
 			plt.close()
 		else:
 			plt.show()
+
+	@staticmethod
+	def plot_matrix(matrix):
+		plt.matshow(matrix, cmap='viridis')
+
+		for i in range(matrix.shape[0]):
+			for j in range(matrix.shape[1]):
+				plt.text(j, i, str(matrix[i, j]), ha='center', va='center', color='red')
+
+		plt.xlabel('Predicted')
+		plt.ylabel('Actual')
+
+		plt.show()
