@@ -3,6 +3,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import seaborn as sns
 
 
 class BaseModel:
@@ -92,15 +93,9 @@ class BaseModel:
 
 	@staticmethod
 	def plot_matrix(matrix):
-		plt.matshow(matrix, cmap='viridis')
-
-		for i in range(matrix.shape[0]):
-			for j in range(matrix.shape[1]):
-				plt.text(j, i, str(matrix[i, j]), ha='center', va='center', color='red')
-
+		sns.heatmap(matrix, annot=True, fmt='.2f', cmap='viridis')
 		plt.xlabel('Predicted')
 		plt.ylabel('Actual')
-
 		plt.show()
 
 	def summary(self):
