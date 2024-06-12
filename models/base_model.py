@@ -102,3 +102,6 @@ class BaseModel:
 		plt.ylabel('Actual')
 
 		plt.show()
+
+	def summary(self):
+		return self.model.summary()
