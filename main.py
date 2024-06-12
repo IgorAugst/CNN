@@ -23,12 +23,11 @@ input_test = input_test / 255
 label_data = one_hot_encode(label_data)
 label_test = one_hot_encode(label_test)
 
-model1 = HogMnist(input_shape=(324,), output_shape=10)
+model1 = HogMnist()
 model1.compile()
 model1.fit(input_data, label_data, epochs=5, val_proportion=0.3)
 accuracy = model1.evaluate(input_test, label_test)
 model1.plot_loss()
 model1.save_model({'accuracy': accuracy['accuracy']})
 model1.plot_matrix(accuracy['confusion_matrix'])
-
-print(model1.summary())
+model1.summary()

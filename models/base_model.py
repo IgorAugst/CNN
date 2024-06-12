@@ -46,7 +46,7 @@ class BaseModel:
 	def build_model(self):
 		raise NotImplementedError('Método build_model não implementado')
 
-	def __init__(self, input_shape=(10, 12, 1), output_shape=26):
+	def __init__(self, input_shape=(28, 28, 1), output_shape=10):
 		self.input_shape = input_shape
 		self.output_shape = output_shape
 		self.model = self.build_model()
@@ -104,4 +104,4 @@ class BaseModel:
 		plt.show()
 
 	def summary(self):
-		return self.model.summary()
+		self.model.summary()
