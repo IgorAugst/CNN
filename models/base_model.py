@@ -7,7 +7,7 @@ import seaborn as sns
 
 
 class BaseModel:
-	def save_model(self, custom_data: dict):
+	def save_model(self, custom_data: dict, confusion_matrix=None):
 		os.makedirs('./modelos', exist_ok=True)
 
 		if not os.path.exists(f'./modelos/models.json'):
@@ -24,16 +24,21 @@ class BaseModel:
 		self.model.save(f'./modelos/{model_name}/modelo.keras')
 		self.plot_loss(save=True, path=f'./modelos/{model_name}/loss.png')
 
+		if confusion_matrix is not None:
+			self.plot_matrix(confusion_matrix, save=True, path=f'./modelos/{model_name}/confusion_matrix.png')
+
 		model_info = {
 			'model_name': model_name,
 			'history': self.training_history.history,
 			'custom_data': custom_data,
+			'erro_plot_loss': f'./modelos/{model_name}/loss.png',
+			'confusion_matrix': f'./modelos/{model_name}/confusion_matrix.png'
 		}
 
 		models.append(model_info)
 
 		with open(f'./modelos/models.json', 'w') as f:
-			json.dump(models, f)
+			json.dump(models, f, indent=4)
 
 	def load_model(self, model_name):
 		self.model = tf.keras.models.load_model(f'./modelos/{model_name}/modelo.keras')
@@ -53,9 +58,9 @@ class BaseModel:
 		self.model = self.build_model()
 		self.training_history = None
 
-	def fit(self, input_data, target_data, epochs, val_proportion=0.3):
+	def fit(self, input_data, target_data, epochs, val_proportion=0.3, batch_size=32):
 		self.training_history = self.model.fit(input_data, target_data, epochs=epochs, validation_split=val_proportion,
-											   callbacks=[self.early_stopping()])
+											   callbacks=[self.early_stopping()], batch_size=batch_size)
 
 	def evaluate(self, test_data, test_target, threshold=None):
 		predictions = self.model.predict(test_data, verbose=False)
@@ -95,11 +100,7 @@ class BaseModel:
 		plt.clf()
 
 	@staticmethod
-	def plot_binary_matrix(matrix):
-		print(matrix)
-		print(matrix[1, 1])
-		print(matrix[0, 1])
-
+	def plot_binary_matrix(matrix, save=False, path=None):
 		TP = matrix[0, 0]
 		TN = matrix[1, 1]
 		FP = matrix[1, 0]
@@ -131,15 +132,21 @@ class BaseModel:
 		plt.table(cellText=cell_text, rowLabels=metric_names, loc='center')
 
 		plt.tight_layout()
+
+		if save:
+			plt.savefig(path)
+			plt.close()
+			return
+
 		plt.show()
 
 		plt.cla()
 		plt.clf()
 
 	@staticmethod
-	def plot_matrix(matrix):
+	def plot_matrix(matrix, save=False, path=None):
 		if matrix.shape == (2, 2):
-			BaseModel.plot_binary_matrix(matrix)
+			BaseModel.plot_binary_matrix(matrix, save, path)
 			return
 		accuracy = np.trace(matrix) / np.sum(matrix)
 
@@ -148,6 +155,12 @@ class BaseModel:
 		plt.ylabel('Real')
 
 		plt.title(f'Acurácia: {accuracy*100:.3f}%')
+
+		if save:
+			plt.savefig(path)
+			plt.close()
+			return
+
 		plt.show()
 
 	def summary(self):

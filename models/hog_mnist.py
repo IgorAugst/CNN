@@ -40,9 +40,9 @@ class HogMnistModel(BaseModel):
 
 		return model
 
-	def fit(self, input_data, target_data, epochs, val_proportion=0.3):
+	def fit(self, input_data, target_data, epochs, val_proportion=0.3, batch_size=32):
 		hog_features = self.extract_hog_features(input_data)
-		super().fit(hog_features, target_data, epochs, val_proportion)
+		super().fit(hog_features, target_data, epochs, val_proportion, batch_size)
 
 	def evaluate(self, test_data, test_target, threshold=None):
 		hog_features = self.extract_hog_features(test_data)
