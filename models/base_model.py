@@ -91,12 +91,59 @@ class BaseModel:
 		else:
 			plt.show()
 
+		plt.cla()
+		plt.clf()
+
+	@staticmethod
+	def plot_binary_matrix(matrix):
+		TP = matrix[1, 1]
+		TN = matrix[0, 0]
+		FP = matrix[0, 1]
+		FN = matrix[1, 0]
+
+		# Calculate the metrics
+		recall = TP / (TP + FN)
+		specificity = TN / (TN + FP)
+		accuracy = (TP + TN) / (TP + TN + FP + FN)
+		precision = TP / (TP + FP)
+
+		# Prepare the data for the table
+		metrics = [recall, specificity, accuracy, precision]
+		metric_names = ['Recall', 'Specificity', 'Accuracy', 'Precision']
+		cell_text = [[f"{metric:.2f}"] for metric in metrics]
+
+		# Plot the confusion matrix
+		plt.figure(figsize=(10, 5))
+		plt.subplot(1, 2, 1)
+		sns.heatmap(matrix, annot=True, fmt='.2f', cmap='viridis',
+					xticklabels=['Negativo', 'Positivo'],
+					yticklabels=['Negativo', 'Positivo'])
+		plt.xlabel('Predicted')
+		plt.ylabel('Actual')
+
+		# Plot the table
+		plt.subplot(1, 2, 2)
+		plt.axis('tight')
+		plt.axis('off')
+		plt.table(cellText=cell_text, rowLabels=metric_names, loc='center')
+
+		plt.tight_layout()
+		plt.show()
+
+		plt.cla()
+		plt.clf()
+
 	@staticmethod
 	def plot_matrix(matrix):
+		if matrix.shape == (2, 2):
+			BaseModel.plot_binary_matrix(matrix)
+			return
 		sns.heatmap(matrix, annot=True, fmt='.2f', cmap='viridis')
 		plt.xlabel('Predicted')
 		plt.ylabel('Actual')
 		plt.show()
+		plt.cla()
+		plt.clf()
 
 	def summary(self):
 		self.model.summary()
