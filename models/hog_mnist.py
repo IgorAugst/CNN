@@ -4,7 +4,7 @@ import cv2
 from models.base_model import BaseModel
 
 
-class HogMnist(BaseModel):
+class HogMnistModel(BaseModel):
 	def __init__(self, input_shape=(324,), output_shape=10):
 		super().__init__(input_shape, output_shape)
 

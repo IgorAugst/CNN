@@ -12,7 +12,6 @@ class SimpleMnistModel(BaseModel):
 			tf.keras.layers.Conv2D(32, (3, 3), activation='leaky_relu'),
 			tf.keras.layers.AveragePooling2D(pool_size=(2, 2)),
 			tf.keras.layers.Flatten(),
-			tf.keras.layers.Dense(64, activation='leaky_relu'),
 			tf.keras.layers.Dense(self.output_shape, activation='softmax')
 		])
 

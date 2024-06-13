@@ -96,32 +96,35 @@ class BaseModel:
 
 	@staticmethod
 	def plot_binary_matrix(matrix):
-		TP = matrix[1, 1]
-		TN = matrix[0, 0]
-		FP = matrix[0, 1]
-		FN = matrix[1, 0]
+		print(matrix)
+		print(matrix[1, 1])
+		print(matrix[0, 1])
 
-		# Calculate the metrics
-		recall = TP / (TP + FN)
-		specificity = TN / (TN + FP)
-		accuracy = (TP + TN) / (TP + TN + FP + FN)
-		precision = TP / (TP + FP)
+		TP = matrix[0, 0]
+		TN = matrix[1, 1]
+		FP = matrix[1, 0]
+		FN = matrix[0, 1]
 
-		# Prepare the data for the table
-		metrics = [recall, specificity, accuracy, precision]
-		metric_names = ['Recall', 'Specificity', 'Accuracy', 'Precision']
-		cell_text = [[f"{metric:.2f}"] for metric in metrics]
+		# Calculando métricas de avaliação
+		precisao = TP / (TP + FP)
+		sensibilidade = TP / (TP + FN)
+		especificidade = TN / (TN + FP)
+		acuracia = (TP + TN) / (TP + TN + FP + FN)
+		f_score = 2 * (precisao * sensibilidade) / (precisao + sensibilidade)
 
-		# Plot the confusion matrix
-		plt.figure(figsize=(10, 5))
+		# Dados para a tabela
+		metrics = [precisao, sensibilidade, especificidade, acuracia, f_score]
+		metric_names = ['Precisão', 'Sensibilidade', 'Especificidade', 'Acurácia', 'F-Score']
+		cell_text = [[f"{metric*100:.2f}%"] for metric in metrics]
+
 		plt.subplot(1, 2, 1)
 		sns.heatmap(matrix, annot=True, fmt='.2f', cmap='viridis',
-					xticklabels=['Negativo', 'Positivo'],
-					yticklabels=['Negativo', 'Positivo'])
-		plt.xlabel('Predicted')
-		plt.ylabel('Actual')
+					xticklabels=['Positivo', 'Negativo'],
+					yticklabels=['Positivo', 'Negativo'])
+		plt.xlabel('Predito')
+		plt.ylabel('Real')
 
-		# Plot the table
+		# Tabela de métricas
 		plt.subplot(1, 2, 2)
 		plt.axis('tight')
 		plt.axis('off')
@@ -138,12 +141,14 @@ class BaseModel:
 		if matrix.shape == (2, 2):
 			BaseModel.plot_binary_matrix(matrix)
 			return
+		accuracy = np.trace(matrix) / np.sum(matrix)
+
 		sns.heatmap(matrix, annot=True, fmt='.2f', cmap='viridis')
-		plt.xlabel('Predicted')
-		plt.ylabel('Actual')
+		plt.xlabel('Predito')
+		plt.ylabel('Real')
+
+		plt.title(f'Acurácia: {accuracy*100:.3f}%')
 		plt.show()
-		plt.cla()
-		plt.clf()
 
 	def summary(self):
 		self.model.summary()
