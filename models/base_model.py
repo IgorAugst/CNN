@@ -10,12 +10,12 @@ class BaseModel:
 	def save_model(self, custom_data: dict, confusion_matrix=None):
 		os.makedirs('./modelos', exist_ok=True)
 
-		if not os.path.exists(f'./modelos/models.json'):
+		if not os.path.exists(f'./modelos/models.json'):  # verifica se o arquivo de modelos existe, se não existir, cria um novo
 			with open(f'./modelos/models.json', 'w') as f:
 				json.dump([], f)
 
 		with open(f'./modelos/models.json', 'r') as f:
-			models = json.load(f)
+			models = json.load(f)  # carrega os modelos existentes
 
 		model_name = self.__class__.__name__ + '_' + str(len(models))
 
@@ -38,16 +38,19 @@ class BaseModel:
 		models.append(model_info)
 
 		with open(f'./modelos/models.json', 'w') as f:
-			json.dump(models, f, indent=4)
+			json.dump(models, f, indent=4)  # salva o modelo no arquivo de modelos
 
+	# função que carrega o modelo de um arquivo existente
 	def load_model(self, model_name):
 		self.model = tf.keras.models.load_model(f'./modelos/{model_name}/modelo.keras')
 
+	# compila o modelo
 	def compile(self, optimizer='adam', loss='mean_squared_error'):
 		self.model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
+	# função para gerar o callback de early stopping
 	def early_stopping(self, patience=2):
-		return tf.keras.callbacks.EarlyStopping(patience=patience)
+		return tf.keras.callbacks.EarlyStopping(patience=patience)  # a paciencia é o número de épocas sem melhora que o treinamento irá esperar antes de parar
 
 	def build_model(self):
 		raise NotImplementedError('Método build_model não implementado')
@@ -56,22 +59,24 @@ class BaseModel:
 		self.input_shape = input_shape
 		self.output_shape = output_shape
 		self.model = self.build_model()
-		self.training_history = None
+		self.training_history = None  # atributo que armazena o histórico de treinamento
 
 	def fit(self, input_data, target_data, epochs, val_proportion=0.3, batch_size=32):
 		self.training_history = self.model.fit(input_data, target_data, epochs=epochs, validation_split=val_proportion,
 											   callbacks=[self.early_stopping()], batch_size=batch_size)
 
 	def evaluate(self, test_data, test_target, threshold=None):
-		predictions = self.model.predict(test_data, verbose=False)
+		predictions = self.model.predict(test_data, verbose=False)  # realiza a predição de todos os dados de teste
 		accuracy = 0
 
-		confusion_matrix = np.zeros((self.output_shape, self.output_shape))
+		confusion_matrix = np.zeros((self.output_shape, self.output_shape))  # cria uma matriz de confusão
 
 		for i, pred in enumerate(predictions):
+			# verifica se a predição é correta com threshold
 			if threshold is None:
 				accuracy += (np.argmax(pred) == np.argmax(test_target[i]))
 				confusion_matrix[np.argmax(test_target[i])][np.argmax(pred)] += 1
+			# verifica se a predição é correta com o valor máximo
 			else:
 				arr = np.where(pred > threshold, 1, 0)
 				if sum(arr) == 1:
