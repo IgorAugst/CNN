@@ -7,7 +7,7 @@ import seaborn as sns
 
 
 class BaseModel:
-	def save_model(self, custom_data: dict, confusion_matrix=None):
+	def save_model(self, custom_data: dict, confusion_matrix=None, model_name=None):
 		os.makedirs('./modelos', exist_ok=True)
 
 		if not os.path.exists(f'./modelos/models.json'):  # verifica se o arquivo de modelos existe, se não existir, cria um novo
@@ -17,7 +17,8 @@ class BaseModel:
 		with open(f'./modelos/models.json', 'r') as f:
 			models = json.load(f)  # carrega os modelos existentes
 
-		model_name = self.__class__.__name__ + '_' + str(len(models))
+		if model_name is None:
+			model_name = self.__class__.__name__ + '_' + str(len(models))
 
 		os.makedirs(f'./modelos/{model_name}', exist_ok=True)
 

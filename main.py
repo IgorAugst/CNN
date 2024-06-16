@@ -4,13 +4,14 @@ import inquirer
 
 
 # função para treinar, exibir resultados e salvar o modelo
-def train_and_evaluate_model(model, input_data, label_data, input_test, label_test):
+def train_and_evaluate_model(model, input_data, label_data, input_test, label_test, model_name=None):
 	model.compile()  # compila o modelo
 	model.fit(input_data, label_data, epochs=10, val_proportion=0.3, batch_size=100)  # realiza o treinamento
 	accuracy = model.evaluate(input_test, label_test)
-	model.save_model({'accuracy': accuracy['accuracy']}, confusion_matrix=accuracy['confusion_matrix'])
-	model.plot_loss()
-	model.plot_matrix(accuracy['confusion_matrix'])
+	model.save_model({'accuracy': accuracy['accuracy']}, confusion_matrix=accuracy['confusion_matrix'],
+					 model_name=model_name)
+	# model.plot_loss()
+	# model.plot_matrix(accuracy['confusion_matrix'])
 	model.summary()  # exibe o resumo do modelo
 
 
@@ -31,10 +32,13 @@ answers = inquirer.prompt(question)
 
 for model_name in answers['modelo']:
 	(input_data, label_data, input_test, label_test), (
-		binary_input_data, binary_label_data, binary_input_test, binary_label_test) = load_and_encode_data(5)  # carrega os dados multiclasse e binário
+		binary_input_data, binary_label_data, binary_input_test, binary_label_test) = load_and_encode_data(
+		9)  # carrega os dados multiclasse e binário
 
 	model = models[model_name]()
 	model_binary = models[model_name](output_shape=2)  # o modelo binário possui apenas dois neurônios de saída
 
-	train_and_evaluate_model(model, input_data, label_data, input_test, label_test)
-	train_and_evaluate_model(model_binary, binary_input_data, binary_label_data, binary_input_test, binary_label_test)
+	train_and_evaluate_model(model, input_data, label_data, input_test, label_test,
+							 model_name=model_name + '_multiclasse')
+	train_and_evaluate_model(model_binary, binary_input_data, binary_label_data, binary_input_test, binary_label_test,
+							 model_name=model_name + '_binario')
