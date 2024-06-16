@@ -27,3 +27,15 @@ def load_data_binary_classificator(desired_class: int):
     label_test = np.where(label_test == desired_class, 0, 1)
 
     return (input_data, label_data), (input_test, label_test)
+
+
+def load_and_encode_data(binary_classificator):
+    (input_data, label_data), (input_test, label_test) = load_data()
+    (binary_input_data, binary_label_data), (binary_input_test, binary_label_test) = load_data_binary_classificator(binary_classificator)
+
+    label_data = one_hot_encode(label_data)
+    label_test = one_hot_encode(label_test)
+    binary_label_data = one_hot_encode(binary_label_data)
+    binary_label_test = one_hot_encode(binary_label_test)
+
+    return (input_data, label_data, input_test, label_test), (binary_input_data, binary_label_data, binary_input_test, binary_label_test)

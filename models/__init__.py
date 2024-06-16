@@ -1,7 +1,8 @@
 from models.mnist_model import MnistModel
 from models.simple_mnist_model import SimpleMnistModel
+from models.hog_mnist import HogMnistModel
 
 models = {
-	'mnist_model': MnistModel,
-	'simple_mnist_model': SimpleMnistModel
+	'hog_mnist': HogMnistModel,
+	'mnist_model': MnistModel
 }

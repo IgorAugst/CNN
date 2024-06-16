@@ -28,7 +28,7 @@ class HogMnistModel(BaseModel):
 
 		return np.array(hog_features)
 
-	def early_stopping(self, patience=10):
+	def early_stopping(self, patience=2):
 		return tf.keras.callbacks.EarlyStopping(patience=patience)
 
 	def build_model(self):

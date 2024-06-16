@@ -46,7 +46,7 @@ class BaseModel:
 	def compile(self, optimizer='adam', loss='mean_squared_error'):
 		self.model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
-	def early_stopping(self, patience=5):
+	def early_stopping(self, patience=2):
 		return tf.keras.callbacks.EarlyStopping(patience=patience)
 
 	def build_model(self):
