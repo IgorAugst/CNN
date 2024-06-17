@@ -6,7 +6,7 @@ import inquirer
 # função para treinar, exibir resultados e salvar o modelo
 def train_and_evaluate_model(model, input_data, label_data, input_test, label_test, model_name=None):
 	model.compile()  # compila o modelo
-	model.fit(input_data, label_data, epochs=10, val_proportion=0.3, batch_size=100)  # realiza o treinamento
+	model.fit(input_data, label_data, epochs=50, val_proportion=0.3, batch_size=100)  # realiza o treinamento
 	accuracy = model.evaluate(input_test, label_test)
 	model.save_model({'accuracy': accuracy['accuracy']}, confusion_matrix=accuracy['confusion_matrix'],
 					 model_name=model_name)
